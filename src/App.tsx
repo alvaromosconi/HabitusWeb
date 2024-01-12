@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+/* eslint-disable no-mixed-spaces-and-tabs */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import { Routes, Route, useLocation } from 'react-router-dom'
+import HabitGrid from './components/HabitsGrid'
+import { CustomNavbar } from './components/CustomNavbar'
+import Login from './pages/Login'
+import { AuthProvider } from './context/AuthContext'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+function App () {
+	const location = useLocation()
+	return (
+		<div className="App h-screen overflow-y-auto">
+			<AuthProvider>
+				<header>
+					{location.pathname !== '/login' && <CustomNavbar />}
+				</header>
+				<Routes>
+					<Route path="/home" element={<HabitGrid />} />
+					<Route path="/" element={<HabitGrid />} />
+					<Route path="/login" element={<Login />} />
+				</Routes>
+			</AuthProvider>
+		</div>
+	)
 }
 
-export default App;
+export default App

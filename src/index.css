@@ -1,13 +1,52 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body{
+    width: 100%;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+header {
+    width: 100%;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: .5;
+    }
+}
+.animate-pulse {
+    animation: pulse 3s cubic-bezier(0.1, 0, 0.6, 1) infinite;
+}
+
+@keyframes scaleBox {
+    50% {
+        transform: scale(1.08);
+    }
+}
+.animate-scaleBox:hover {
+    animation: scaleBox  3s infinite;
+}
+
+@keyframes scaleButton {
+    50% {
+        transform: scale(1.5);
+    }
+}
+.animate-scaleButton:hover {
+    animation: scaleButton  3s infinite;
+}
+
+.MuiOutlinedInput-notchedOutline {
+    border-color: #D44316 !important;
+}
+
+.MuiOutlinedInput {
+    border-color: #D44316 !important;
+}
+
+
+.Mui-selected {
+       background-color: #D44316 !important;
+       color: white !important
 }
