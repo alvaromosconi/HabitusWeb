@@ -2,11 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body{
-    width: 100%;
-}
-
-header {
+html, body {
     width: 100%;
 }
 

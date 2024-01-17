@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/dot-notation */
 import axios, { type AxiosResponse } from 'axios'
 import { type LoginData, type Habit, type User, type PostHabit, type Category, type PostCategory } from '../types/habitus-types'
@@ -7,7 +8,17 @@ const instance = axios.create({
     timeout: 15000
 })
 
-const handleResponse = (response: AxiosResponse) => response.data
+const handleResponse = (response: AxiosResponse) => {
+    try {
+        if (response.status >= 200 && response.status < 300) {
+            return response.data // Success
+        } else {
+            throw new Error(response.data)
+        }
+    } catch (error) {
+        return error
+    }
+}
 
 instance.interceptors.request.use(function (config) {
     const token = localStorage.getItem('token')

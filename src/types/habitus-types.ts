@@ -5,7 +5,7 @@ export interface Habit {
     name: string
     description: string
     notificationTime: string
-    selectedDaysSerialized: string
+    selectedDays: WeekDays[]
     state: HabitState
 }
 
@@ -20,11 +20,11 @@ export interface User {
 }
 
 export interface PostHabit {
-    categoryId: number
+    categoryId: number | undefined
     name: string
     description: string
     notificationTime: string
-    selectedDays: string[]
+    selectedDays: WeekDays[]
     state: HabitState
 }
 

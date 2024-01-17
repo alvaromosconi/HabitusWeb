@@ -10,6 +10,7 @@ function HabitGrid () {
     const [habits, setHabits] = useState<Habit[]>([])
     const [selectedHabit, setSelectedHabit] = useState<Habit | undefined>(undefined)
     const [categories, setCategories] = useState<string[]>([])
+
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
     const handleHabitChanges = (newHabit: Habit) => {
@@ -18,34 +19,40 @@ function HabitGrid () {
             setHabits([...habits, newHabit])
         } else {
             habits[existingHabitIndex] = newHabit
-            setHabits(() => habits)
+            setHabits([...habits])
         }
-
-        closeModal()
+        setIsModalOpen(false)
     }
 
     useEffect(() => {
-        HabitusAPI.getHabits()
+        const fetchHabits = () => {
+            HabitusAPI.getHabits()
             .then((data: Habit[]) => {
                 setHabits(data)
-                const userCategories = Array.from(new Set(data.map((habit) => habit.category.name)))
-                setCategories(userCategories)
             })
             .catch((err: any) => {
                 console.log(err)
             })
-    }, [setHabits])
+        }
+        fetchHabits()
+    }, [])
 
     useEffect(() => {
+        const updateCategories = () => {
+            const userCategories = Array.from(new Set(habits.map((habit) => habit.category.name)))
+            setCategories(userCategories)
+        }
+
+        updateCategories()
     }, [habits])
 
     const handleAddButtonClick = () => {
-        openModal()
+        setIsModalOpen(true)
     }
 
     const handleEditButtonClick = (habit: Habit) => {
         setSelectedHabit(habit)
-        openModal()
+        setIsModalOpen(true)
     }
 
     const handleDeleteButtonClick = async (habit: Habit) => {
@@ -60,24 +67,20 @@ function HabitGrid () {
         }
     }
 
-    const openModal = () => {
-        setIsModalOpen(true)
+    const closeModal = () => {
+        setIsModalOpen(false)
     }
 
-    const closeModal = () => {
-        if (isModalOpen) {
-            setIsModalOpen(false)
-        }
+    const renderModalContent = (children: React.ReactNode) => {
+        return (
+            <Modal open={true} onClose={closeModal}>
+                {children}
+            </Modal>
+        )
     }
 
     return (
         <div className='mx-16 my-16'>
-            <button className="bg-[#ade017] hover:bg-[#cdee6a] text-white font-bold py-2 px-4 rounded-full inline-flex items-center mb-8">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 mr-2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-                <span>Add Category</span>
-            </button>
             <DefaultHabitBox onAddButtonClick={handleAddButtonClick} />
             <div className="">
                 {categories.map((category, index) => (
@@ -100,11 +103,12 @@ function HabitGrid () {
             ))}
             </div>
             {isModalOpen &&
-                <Modal onClose={closeModal}>
-                    <HabitForm habitToUpdate={selectedHabit}
-                               onHabitsChange={handleHabitChanges}
+                renderModalContent(
+                    <HabitForm
+                        habitToUpdate={selectedHabit}
+                        onHabitsChange={handleHabitChanges}
                     />
-                </Modal>
+                )
             }
         </div>
     )
