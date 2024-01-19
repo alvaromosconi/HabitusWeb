@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/dot-notation */
 import axios, { type AxiosResponse } from 'axios'
-import { type LoginData, type Habit, type User, type PostHabit, type Category, type PostCategory } from '../types/habitus-types'
+import { type LoginData, type Habit, type PostHabit, type Category, type PostCategory, type APIResponse } from '../types/habitus-types'
 
 const instance = axios.create({
     baseURL: process.env.REACT_APP_API_BASE_URL,
@@ -37,10 +37,9 @@ const requests = {
 export const HabitusAPI = {
     login: async (post: LoginData): Promise<boolean> => {
         try {
-            const response: string = await requests.post('authentication/login', post)
-            localStorage.setItem('token', response)
-            const user: User = await requests.get('authentication/user')
-            localStorage.setItem('user', JSON.stringify(user))
+            const response: APIResponse = await requests.post('users/login', post)
+            localStorage.setItem('user', JSON.stringify(response.resource))
+            localStorage.setItem('token', response.resource.token)
             return true
         } catch (error) {
             console.error('Error during login:', error)

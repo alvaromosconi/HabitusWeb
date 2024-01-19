@@ -15,8 +15,10 @@ export interface Category {
 }
 
 export interface User {
-    userId: string
+    id: string
     userName: string
+    phoneNumber: string
+    token: string
 }
 
 export interface PostHabit {
@@ -40,6 +42,12 @@ export interface HabitContextType {
 export interface LoginData {
     username: string
     password: string
+}
+
+export interface APIResponse {
+    success: boolean
+    message: string
+    resource: any
 }
 
 export enum WeekDays {
