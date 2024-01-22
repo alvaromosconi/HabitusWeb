@@ -8,13 +8,14 @@ interface HabitBoxProps {
 	habit: Habit
 	onEditButtonClick: () => void
 	onDeleteButtonClick: () => void
+	onTelegramButtonClick: () => void
 }
 
 interface DefaultHabitProps {
 	onAddButtonClick: () => void
 }
 
-export function HabitBox ({ habit, onEditButtonClick, onDeleteButtonClick }: HabitBoxProps) {
+export function HabitBox ({ habit, onEditButtonClick, onDeleteButtonClick, 	onTelegramButtonClick }: HabitBoxProps) {
 	return (
 		<div className='flex flex-col flex-nowrap habit-container p-4 border-2 rounded-2xl hover:bg-gray-200'>
 			<div className='habit-header flex justify-between '>
@@ -45,6 +46,11 @@ export function HabitBox ({ habit, onEditButtonClick, onDeleteButtonClick }: Hab
 					</span>
 				))}
 				</div>
+				<button type="button" onClick={	onTelegramButtonClick } className='self-end mx-2 animate-scaleButton'>
+					<a href="https://t.me/habitus_v1_bot" target="_blank" rel="noreferrer">
+					Notify me by telegram
+					</a>
+				</button>
 			</div>
 		</div>
 	)

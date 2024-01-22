@@ -74,7 +74,7 @@ export const Categories = () => {
             <CategoriesTable categories={categories}
                              onAddButtonClick={handleAddButtonClick}
                              onEditButtonClick={handleEditButtonClick}
-                             onDeleteButtonClick={handleDeleteButtonClick}
+                             onDeleteButtonClick={() => handleDeleteButtonClick}
             />
             {isModalOpen && renderModalContent(
                 <CategoryForm categoryToUpdate={selectedCategory}

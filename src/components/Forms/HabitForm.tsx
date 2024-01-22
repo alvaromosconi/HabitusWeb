@@ -15,6 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { ArrowUpRightIcon } from '@heroicons/react/24/solid'
+import Select from 'react-select'
 
 interface Props {
     habitToUpdate?: Habit
@@ -50,7 +51,7 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
     const [time, setTime] = React.useState<Dayjs>(dayjs('07:30:00', 'HH:mm:ss'))
     const [selectedDays, setSelectedDays] = useState<WeekDays[]>([])
     const [categories, setCategories] = useState<Category[] | undefined>(undefined)
-    const [selectedCategory, setSelectedCategory] = useState<number>(1)
+    const [selectedCategory, setSelectedCategory] = useState<Category>({ name: 'Select Dept', id: 0 })
     const [show, setShow] = useState<boolean>(false)
 
     const fetchCategories = async () => {
@@ -58,7 +59,7 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
             await HabitusAPI.getCategories()
                 .then((data: Category[]) => {
                     setCategories(data)
-                    setSelectedCategory(habitToUpdate ? habitToUpdate.category.id : data[0].id)
+                    setSelectedCategory(habitToUpdate ? habitToUpdate.category : data[0])
                 })
 
         } catch (error) {
@@ -108,7 +109,7 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
 
     const defaultValues: FormData = {
         name: habitToUpdate?.name ?? '',
-        categoryId: habitToUpdate?.category?.id,
+        categoryId: habitToUpdate?.category?.id ?? selectedCategory.id,
         selectedDays: habitToUpdate?.selectedDays ?? [WeekDays.Monday],
         description: habitToUpdate?.description ?? ''
     }
@@ -121,7 +122,7 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
 
     const onSubmitHandler = async (values: FormData) => {
         try {
-            const habitFormatted = { ...values, notificationTime: time.format('HH:mm:ss').toString(), selectedDays, state: HabitState.Active, categoryId: selectedCategory }
+            const habitFormatted = { ...values, notificationTime: time.format('HH:mm:ss').toString(), selectedDays, state: HabitState.Active, categoryId: selectedCategory?.id }
             if (habitToUpdate !== undefined) {
                 onHabitsChange(await HabitusAPI.updateHabit(habitFormatted, habitToUpdate.id))
             } else {
@@ -164,21 +165,17 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
                         <label className="text-sm font-medium text-gray-700">Category</label>
                         {errors.categoryId && <span className=" text-sm text-red-600 mx-2 block">{ errors.categoryId.message }</span>}
                         <div className='flex justify-between'>
-                            <select
-                                value={selectedCategory}
-                                {...register('categoryId', { valueAsNumber: true, required: true })}
-                                onChange={(e) => {
-                                    console.log(e.target.value)
-                                    setSelectedCategory(Number(e.target.value))
-                                }}
-                                className="w-full h-10 border-b-2 border-gray-300 rounded-md focus:outline-none focus:border-[#D44316] indent-2"
-                            >
-                                {categories?.map((category, index) => (
-                                    <option key={index} value={category.id}>
-                                        {category.name}
-                                    </option>
-                                ))}
-                        </select>
+                        <Select
+                            name='categoryId'
+                            options={categories?.map(category => ({ label: category.name, value: category.id }))}
+                            defaultValue={{ label: selectedCategory.name, value: selectedCategory.id }}
+                            value={{ label: selectedCategory.name, value: selectedCategory.id }}
+                            onChange={(selectedOption) => {
+                                console.log(selectedOption)
+                                setSelectedCategory({ id: selectedOption?.value ?? 0, name: selectedOption?.label ?? 'Select' })
+                            }}
+                            className="w-full border-b-2 border-gray-300 rounded-md"
+                        />
                         {show
                             ? <div className='flex'>
                                 <button className='ml-2 bg-[#6b92cf] hover:bg-[#4a6f9d] w-fit rounded-full p-2 h-fit relative bottom-0 text-sm border-none text-white transition duration-300 ease-in-out whitespace-nowrap'>

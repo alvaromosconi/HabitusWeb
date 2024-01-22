@@ -30,10 +30,11 @@ const requests = {
     get: async (url: string) => await instance.get(url).then(handleResponse),
     post: async (url: string, body: unknown) => await instance.post(url, body).then(handleResponse),
     put: async (url: string, body: unknown) => await instance.put(url, body).then(handleResponse),
+    putWithoutBody: async (url: string) => await instance.put(url).then(handleResponse),
     delete: async (url: string) => await instance.delete(url).then(handleResponse)
 }
 
-// Login
+// User
 export const HabitusAPI = {
     login: async (post: LoginData): Promise<boolean> => {
         try {
@@ -46,6 +47,7 @@ export const HabitusAPI = {
         }
         return false
     },
+     updateTelegramChatId: async (chatId: number): Promise<APIResponse> => await requests.putWithoutBody(`users?chatId=${chatId}`),
 
     // Habits
     getHabits: async (): Promise<Habit[]> => await requests.get('habits'),
