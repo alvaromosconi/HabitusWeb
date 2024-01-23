@@ -4,21 +4,7 @@ module.exports = {
         "es2021": true
     },
     "extends": [
-        "standard-with-typescript",
-        "plugin:react/recommended"
-    ],
-    "overrides": [
-        {
-            "env": {
-                "node": true
-            },
-            "files": [
-                ".eslintrc.{js,cjs}"
-            ],
-            "parserOptions": {
-                "sourceType": "script"
-            }
-        }
+        "standard-with-typescript"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -26,13 +12,13 @@ module.exports = {
         "project": "./tsconfig.json"
     },
     "plugins": [
-        "react"
+        "@typescript-eslint"
     ],
     "rules": {
         "@typescript-eslint/explicit-function-return-type": "off",
         "react/react-in-jsx-scope": "off",
         "@typescript-eslint/indent": "off",
-        "no-tabs": 0,
+        "no-tabs": 0
     },
     ignorePatterns: ['.eslintrc.js', 'tailwind.config.js']
 }

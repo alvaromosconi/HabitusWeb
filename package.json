@@ -28,6 +28,7 @@
     "@types/react-dom": "^18.2.18",
     "axios": "^1.6.5",
     "dayjs": "^1.11.10",
+    "eslint-config-standard-with-typescript": "^43.0.1",
     "react-hook-form": "^7.49.3",
     "react-router-dom": "^6.21.3",
     "react-scripts": "^5.0.1",
