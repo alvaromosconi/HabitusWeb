@@ -6,6 +6,7 @@ export interface Habit {
     description: string
     notificationTime: string
     selectedDays: WeekDays[]
+    notifyByTelegram: boolean
     state: HabitState
 }
 
@@ -18,6 +19,7 @@ export interface User {
     id: string
     userName: string
     phoneNumber: string
+    chatId: number
     token: string
 }
 
@@ -40,7 +42,12 @@ export interface HabitContextType {
 }
 
 export interface LoginData {
-    username: string
+    email: string
+    password: string
+}
+
+export interface RegisterData {
+    email: string
     password: string
 }
 

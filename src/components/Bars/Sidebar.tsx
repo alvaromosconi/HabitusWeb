@@ -4,7 +4,7 @@
 /* eslint-disable react/prop-types */
 
 import { Link, useLocation } from 'react-router-dom'
-import { DashboardIcon, ExitIcon, LeftArrowIcon } from '../../assets/Icons'
+import { HashtagIcon, QueueListIcon, XMarkIcon } from '@heroicons/react/24/solid'
 
 interface SidebarProps {
     show: boolean
@@ -63,7 +63,7 @@ export default function Sidebar({ show, setter }: SidebarProps) {
                     <div className='w-10 h-10 mt-5 mr-6'>
                         <MenuItem
                             route="/"
-                            icon={<ExitIcon/>}
+                            icon={<XMarkIcon className='w-6 h-6'/>}
                         />
                     </div>
                 </div>
@@ -71,7 +71,12 @@ export default function Sidebar({ show, setter }: SidebarProps) {
                     <MenuItem
                         name="Dashboard"
                         route="/"
-                        icon={<DashboardIcon/>}
+                        icon={<HashtagIcon/>}
+                    />
+                    <MenuItem
+                        name="Categories"
+                        route="/categories"
+                        icon={<QueueListIcon />}
                     />
                 </div>
             </div>

@@ -1,8 +1,9 @@
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable no-mixed-spaces-and-tabs */
 
-import { useState } from 'react'
-import { LeftArrowIcon, MenuIcon } from '../../assets/Icons'
+import { useContext, useState } from 'react'
+import { Bars4Icon, UserCircleIcon } from '@heroicons/react/24/solid'
+import { AuthContext } from '../../context/AuthContext'
 
 // Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
 
@@ -13,6 +14,7 @@ interface Props {
 
 export function Navbar ({ showSidebar, setShowSidebar }: Props) {
 	const [isOpen, setIsOpen] = useState(false)
+	const { logout } = useContext(AuthContext)
 
 	const toggleDropdown = () => {
 		setIsOpen(!isOpen)
@@ -25,7 +27,7 @@ export function Navbar ({ showSidebar, setShowSidebar }: Props) {
 					<div className="flex flex-1 items-center justify-between ">
 						<div className={'md:hidden p-4'} onClick={() => { setShowSidebar((oldVal: boolean) => !oldVal) }}>
 							<button>
-								{!showSidebar ? <MenuIcon /> : <LeftArrowIcon />}
+								{!showSidebar && <Bars4Icon className='w-6 h-6'/>}
 							</button>
 						</div>
 						<div className="flex flex-shrink-0 items-center">
@@ -36,10 +38,8 @@ export function Navbar ({ showSidebar, setShowSidebar }: Props) {
 							: <> </>}
 							<div className="hidden sm:ml-6 sm:block">
 								<div className="flex space-x-4">
-									<a href="#" className="text-lg text-white px-3 py-2 font-medium" aria-current="page">My Habits</a>
-									<a href="#" className="text-lg text-white px-3 py-2 font-medium">Statistics</a>
-									<a href="#" className="text-lg text-white px-3 py-2 font-medium">Habit Partners</a>
-									<a href="#" className="text-lg text-white px-3 py-2 font-medium">Community Habits</a>
+									<a href="/" className="text-lg text-white px-3 py-2 font-medium" aria-current="page">My Habits</a>
+									<a href="/categories" className="text-lg text-white px-3 py-2 font-medium">Categories</a>
 								</div>
 							</div>
 						</div>
@@ -54,22 +54,19 @@ export function Navbar ({ showSidebar, setShowSidebar }: Props) {
 							>
 								<span className="absolute -inset-1.5"></span>
 								<span className="sr-only">Open user menu</span>
-								<img
-									className="h-12 w-12 rounded-full"
-									src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-									alt="add-habit-button"
-								/>
+								<UserCircleIcon className='w-8 h-8'/>
 							</button>
-							<div className={`absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${isOpen ? 'block' : 'hidden'}`}>
-								<a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-0">
-									Your Profile
-								</a>
-								<a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-1">
-									Settings
-								</a>
-								<a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-2">
-									Sign out
-								</a>
+							<div className={`absolute right-0 z-10 mt-2 w-max origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${isOpen ? 'block' : 'hidden'}`}>
+								{localStorage.getItem('authenticated') === 'true'
+								?	<button type='button' onClick={logout}>
+										<a href="/login" className="w-max hover:bg-gray-300 block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-2">
+											Sign out
+										</a>
+									</button>
+								:	<a href="/login" className="w-max hover:bg-gray-300 block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-2">
+										Sign in
+									</a>
+								}
 							</div>
 					</div>
 					</div>

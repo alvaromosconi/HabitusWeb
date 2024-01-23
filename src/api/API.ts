@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/dot-notation */
 import axios, { type AxiosResponse } from 'axios'
-import { type LoginData, type Habit, type PostHabit, type Category, type PostCategory, type APIResponse } from '../types/habitus-types'
+import { type LoginData, type Habit, type PostHabit, type Category, type PostCategory, type APIResponse, type RegisterData } from '../types/habitus-types'
 
 const instance = axios.create({
     baseURL: process.env.REACT_APP_API_BASE_URL,
@@ -36,16 +36,23 @@ const requests = {
 
 // User
 export const HabitusAPI = {
-    login: async (post: LoginData): Promise<boolean> => {
-        try {
-            const response: APIResponse = await requests.post('users/login', post)
+    login: async (post: LoginData): Promise<APIResponse> => {
+        const response: APIResponse = await requests.post('users/login', post)
+        if (response.success) {
             localStorage.setItem('user', JSON.stringify(response.resource))
             localStorage.setItem('token', response.resource.token)
-            return true
-        } catch (error) {
-            console.error('Error during login:', error)
+            return response
+        } else {
+            throw new Error(response.message)
         }
-        return false
+    },
+    register: async (post: RegisterData): Promise<APIResponse> => {
+        const response: APIResponse = await requests.post('users/register', post)
+        if (response.success) {
+            return response
+        } else {
+            throw new Error(response.message)
+        }
     },
      updateTelegramChatId: async (chatId: number): Promise<APIResponse> => await requests.putWithoutBody(`users?chatId=${chatId}`),
 
@@ -55,6 +62,7 @@ export const HabitusAPI = {
     postHabit: async (post: PostHabit): Promise<Habit> => await requests.post('habits', post),
     updateHabit: async (post: PostHabit, id: number): Promise<Habit> => await requests.put(`habits/${id}`, post),
     deleteHabit: async (id: number): Promise<Habit> => await requests.delete(`habits/${id}`),
+    enableTelegramReminder: async (id: number): Promise<Habit> => await requests.putWithoutBody(`habits/enableTelegram/${id}`),
 
     // Categories
     getCategories: async (): Promise<Category[]> => await requests.get('categories'),

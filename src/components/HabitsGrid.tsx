@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable no-void */
 import React, { useEffect, useState } from 'react'
-import { type Habit } from '../types/habitus-types'
+import { type APIResponse, type Habit } from '../types/habitus-types'
 import { DefaultHabitBox, HabitBox } from './HabitBox'
 import { HabitusAPI } from '../api/API'
 import HabitForm from './forms/HabitForm'
 import Modal from './Modal'
-import TelegramChatIdInput from './forms/TelegramChatIdInput'
+import TelegramSetupForm from './forms/TelegramSetupForm'
 
 function HabitGrid () {
     const [habits, setHabits] = useState<Habit[]>([])
@@ -74,14 +75,17 @@ function HabitGrid () {
     }
 
     const handleTelegramSubmit = async (userEnteredCode: number) => {
-        try {
-            await HabitusAPI.updateTelegramChatId(Number(userEnteredCode))
-        } catch (error) {
-            console.error('Error sending Telegram code:', error)
-            alert('Error sending Telegram code. Please try again.')
-        } finally {
-            setShowTelegramInput(false)
-        }
+        await HabitusAPI.updateTelegramChatId(userEnteredCode)
+            .then(async (response: APIResponse) => {
+                localStorage.setItem('user', JSON.stringify(response.resource))
+            })
+            .catch(async (response: APIResponse) => {
+                console.error('Error sending Telegram code:', response.message)
+                alert('Error sending Telegram code. Please try again.')
+            })
+            .finally(() => {
+                setShowTelegramInput(false)
+            })
     }
 
     const closeModal = () => {
@@ -124,7 +128,7 @@ function HabitGrid () {
                 />
             )}
             {showTelegramInput && renderModalContent(
-                <TelegramChatIdInput handleTelegramSubmit={handleTelegramSubmit}/>
+                <TelegramSetupForm handleTelegramSubmit={handleTelegramSubmit}/>
             )}
         </div>
     )
