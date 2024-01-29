@@ -10,6 +10,8 @@ import HabitusAPI from '../../api/API'
 import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { type Dayjs } from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import { type ZodType, z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -23,6 +25,9 @@ interface Props {
 }
 
 const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
+
+    dayjs.extend(utc)
+    dayjs.extend(timezone)
 
     interface FormData {
         name: string
@@ -122,7 +127,11 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
 
     const onSubmitHandler = async (values: FormData) => {
         try {
-            const habitFormatted = { ...values, notificationTime: time.format('HH:mm:ss').toString(), selectedDays, state: HabitState.Active, categoryId: selectedCategory?.id }
+            console.log(time.format('HH:mm:ss').toString())
+            const offset = dayjs().utcOffset()
+            const utcTime = time.subtract(offset, 'minute')
+            console.log(utcTime.format('HH:mm:ss').toString())
+            const habitFormatted = { ...values, notificationTime: utcTime.format('HH:mm:ss').toString(), selectedDays, state: HabitState.Active, categoryId: selectedCategory?.id }
             if (habitToUpdate !== undefined) {
                 onHabitsChange(await HabitusAPI.updateHabit(habitFormatted, habitToUpdate.id))
             } else {
@@ -171,7 +180,6 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
                             defaultValue={{ label: selectedCategory.name, value: selectedCategory.id }}
                             value={{ label: selectedCategory.name, value: selectedCategory.id }}
                             onChange={(selectedOption) => {
-                                console.log(selectedOption)
                                 setSelectedCategory({ id: selectedOption?.value ?? 0, name: selectedOption?.label ?? 'Select' })
                             }}
                             className="w-full border-b-2 border-gray-300 rounded-md"
@@ -198,8 +206,8 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
                                 ampm={false}
                                 onChange={newValue => {
                                     if (newValue != null) {
-                                        const timeString: Dayjs = newValue
-                                        setTime(timeString)
+                                        setTime(newValue)
+                                        console.log(newValue)
                                     }
                                 }}
                                 className=""

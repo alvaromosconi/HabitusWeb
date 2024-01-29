@@ -8,8 +8,14 @@ import { HabitusAPI } from '../api/API'
 import HabitForm from './forms/HabitForm'
 import Modal from './Modal'
 import TelegramSetupForm from './forms/TelegramSetupForm'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 
 function HabitGrid () {
+    dayjs.extend(utc)
+    dayjs.extend(timezone)
+
     const [habits, setHabits] = useState<Habit[]>([])
     const [selectedHabit, setSelectedHabit] = useState<Habit | undefined>(undefined)
     const [categories, setCategories] = useState<string[]>([])
@@ -31,7 +37,12 @@ function HabitGrid () {
         const fetchHabits = () => {
             HabitusAPI.getHabits()
                 .then((data: Habit[]) => {
-                    setHabits(data)
+                    // Transformar cada habit.notificationTime a la hora local
+                    const habitsWithLocalTime = data.map(habit => {
+                        const localTime = dayjs.utc(habit.notificationTime, 'HH:mm:ss').tz(dayjs.tz.guess())
+                        return { ...habit, notificationTime: localTime.format('HH:mm:ss') }
+                    })
+                    setHabits(habitsWithLocalTime)
                 })
                 .catch((err: any) => {
                     console.log(err)

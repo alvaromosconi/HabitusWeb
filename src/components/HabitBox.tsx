@@ -30,7 +30,7 @@ export function HabitBox ({ habit, onEditButtonClick, onDeleteButtonClick, 	onTe
 			const user: User = JSON.parse(userItem)
 			const chatId = user.chatId
 			console.log(chatId)
-			if (chatId !== undefined) {
+			if (chatId !== undefined && chatId !== 0) {
 				await HabitusAPI.enableTelegramReminder(habit.id)
 				setTelegramReminder((prev) => !prev)
 			} else { onTelegramButtonClick() }

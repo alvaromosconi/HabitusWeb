@@ -16,7 +16,7 @@ const TelegramSetupForm = ({ handleTelegramSubmit }: Props) => {
           <div className='max-w-md w-full bg-white p-6 rounded-md shadow-md'>
           <div className='tutorial'>
           <p>
-            1. Click on <a href="https://t.me/habitus_v1_bot" target="_blank" rel="noreferrer">
+            1. Click on <a href="https://t.me/habitus_v1_bot" target="_blank" rel="noreferrer" className='text-blue-500 hover:text-blue-400 hover:font-bold'>
               Get Telegram Code
             </a>
             <br />
