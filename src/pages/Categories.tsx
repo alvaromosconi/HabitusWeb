@@ -4,12 +4,14 @@ import CategoryForm from '../components/forms/CategoryForm'
 import Modal from '../components/Modal'
 import HabitusAPI from '../api/API'
 import { type Category } from '../types/habitus-types'
+import { ColorRing } from 'react-loader-spinner'
 
 export const Categories = () => {
     const [categories, setCategories] = useState<Category[]>([])
     const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined)
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const onCategoriesChange = (newCategory: Category) => {
         const existingHabitIndex = categories.findIndex((cat) => cat.id === newCategory.id)
@@ -32,6 +34,7 @@ export const Categories = () => {
     }
 
     const handleDeleteButtonClick = async (category: Category) => {
+        setIsLoading(true)
         try {
             await HabitusAPI.deleteCategory(category.id)
             setCategories((prevCategories) => {
@@ -41,6 +44,7 @@ export const Categories = () => {
         } catch (error) {
             console.error('Error deleting category:', error)
         }
+        setIsLoading(false)
     }
 
     useEffect(() => {
@@ -48,12 +52,14 @@ export const Categories = () => {
       }, [])
 
     const getCategories = async () => {
+        setIsLoading(true)
         try {
             const categoriesData = (await HabitusAPI.getCategories())
             setCategories(categoriesData)
         } catch (error) {
             console.error('Error fetching categories:', error)
         }
+        setIsLoading(false)
     }
 
     const renderModalContent = (children: React.ReactNode) => {
@@ -69,8 +75,13 @@ export const Categories = () => {
     }
 
     return (
-        <div className='mx-32 my-32'>
-
+        <div className='mx-16 my-16'>
+            {isLoading
+            ? <div className='fixed top-0 left-0 w-full h-full bg-[rgba(255, 255, 255, 0.7)] flex items-center justify-center z-999'>
+                    <ColorRing width={100} height={100}/>
+                </div>
+                : ''
+            }
             <CategoriesTable categories={categories}
                              onAddButtonClick={handleAddButtonClick}
                              onEditButtonClick={handleEditButtonClick}

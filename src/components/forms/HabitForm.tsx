@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { ArrowUpRightIcon } from '@heroicons/react/24/solid'
 import Select from 'react-select'
+import { ColorRing } from 'react-loader-spinner'
 
 interface Props {
     habitToUpdate?: Habit
@@ -45,6 +46,8 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
         state: habitToUpdate?.state ?? HabitState.Active
     })
 
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+
     useEffect(() => {
         if (habitToUpdate !== undefined) {
             setTime(dayjs(habitToUpdate?.notificationTime, 'HH:mm:ss'))
@@ -60,6 +63,7 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
     const [show, setShow] = useState<boolean>(false)
 
     const fetchCategories = async () => {
+        setIsLoading(true)
         try {
             await HabitusAPI.getCategories()
                 .then((data: Category[]) => {
@@ -70,15 +74,17 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
         } catch (error) {
             console.error('Error deleting habit:', error)
         }
+        setIsLoading(false)
     }
 
     useEffect(() => {
+        setIsLoading(true)
         void fetchCategories()
         categories ?? setShow(true)
+        setIsLoading(false)
     }, [])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        console.table(categories)
         const { name, value, type } = e.target
         if (value !== undefined) {
             setHabit({ ...habit, [name]: value })
@@ -127,23 +133,30 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
 
     const onSubmitHandler = async (values: FormData) => {
         try {
-            console.log(time.format('HH:mm:ss').toString())
             const offset = dayjs().utcOffset()
             const utcTime = time.subtract(offset, 'minute')
-            console.log(utcTime.format('HH:mm:ss').toString())
             const habitFormatted = { ...values, notificationTime: utcTime.format('HH:mm:ss').toString(), selectedDays, state: HabitState.Active, categoryId: selectedCategory?.id }
             if (habitToUpdate !== undefined) {
+                setIsLoading(true)
                 onHabitsChange(await HabitusAPI.updateHabit(habitFormatted, habitToUpdate.id))
             } else {
+                setIsLoading(true)
                 onHabitsChange(await HabitusAPI.postHabit(habitFormatted))
             }
         } catch (e) {
             console.error(e)
          }
+         setIsLoading(false)
     }
 
     return (
         <div className="bg-gray-50 rounded-xl grid grid-cols-1 px-4 py-4 w-full h-full">
+            {isLoading
+            ? <div className='fixed top-0 left-0 w-full h-full bg-[rgba(255, 255, 255, 0.7)] flex items-center justify-center z-999'>
+                    <ColorRing width={100} height={100}/>
+                </div>
+                : ''
+            }
             <div className="flex justify-between flex-col h-max">
                 <h2 className="text-3xl font-bold text-center text-[#E04717] mb-4">{habitToUpdate ? 'Update Habit' : 'New Habit'}</h2>
                 <form onSubmit={handleSubmit(onSubmitHandler)} className="grid grid-cols-1 max-w-[400px] gap-y-4">
@@ -207,7 +220,6 @@ const HabitForm = ({ habitToUpdate, onHabitsChange }: Props) => {
                                 onChange={newValue => {
                                     if (newValue != null) {
                                         setTime(newValue)
-                                        console.log(newValue)
                                     }
                                 }}
                                 className=""

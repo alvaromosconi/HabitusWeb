@@ -6,9 +6,10 @@ import { Alert } from '@mui/material'
 import { z, type ZodType } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ColorRing } from 'react-loader-spinner'
 
 const LoginForm = () => {
-    const { authenticated, authenticate, loginError } = useContext(AuthContext)
+    const { authenticated, authenticate, loginError, isLoading } = useContext(AuthContext)
 
     const [loginData, setLoginData] = useState<LoginData>({
         email: '',
@@ -25,7 +26,7 @@ const LoginForm = () => {
     }
 
     const LoginSchema: ZodType<FormData> = z.object({
-        email: z.string().email(),
+        email: z.string().email().regex(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, 'Please enter a valid email.'),
         password: z
             .string()
             .min(8, 'Password must be at least 8 characters long')
@@ -48,10 +49,9 @@ const LoginForm = () => {
     }
 
     return (
-        <div className='flex flex-col border-4 border-l-4 border-[rgba(0, 0, 0, 0.1)] h-[460px] w-[400px] min-w-[360px] p-8 bg-white rounded-md shadow-md'>
+        <div className='flex flex-col border-4 border-l-4 border-[rgba(0, 0, 0, 0.1)] h-[470px] w-[400px] min-w-[360px] p-8 bg-white rounded-md shadow-md'>
             <h1 className='self-left m-2 font-bold text-4xl text-gray-800'>Sign in</h1>
             <form className='flex flex-col my-10' onSubmit={handleSubmit(onSubmitHandler)}>
-                {(errors.email != null) && <span className=" text-sm text-red-600 mx-2 block">{errors.email.message}</span>}
                 <input
                     className='font-mono text-xl font-black h-14 border-2 border-gray-700 p-3 mb-2 w-full rounded-md focus:outline-none focus:border-[#D44316]'
                     required
@@ -61,7 +61,7 @@ const LoginForm = () => {
                     {...register('email')}
                     onChange={handleChange}
                 />
-                {(errors.password != null) && <span className=" text-sm text-red-600 mx-2 block">{errors.password.message}</span>}
+                {(errors.email != null) && <span className="text-sm text-red-600 font-bold mx-2 block">{errors.email.message}</span>}
                 <input
                     className='font-mono text-xl mt-2 font-black h-14 border-2 border-gray-700 p-3 mb-4 w-full rounded-md focus:outline-none focus:border-[#D44316]'
                     required
@@ -71,12 +71,16 @@ const LoginForm = () => {
                     {...register('password')}
                     onChange={handleChange}
                 />
+                {(errors.password != null) && <span className="text-sm text-red-600 font-bold mx-2 block">{errors.password.message}</span>}
                 <button
-                    className='bg-[#E04717] h-16 text-lg text-white font-bold p-3 rounded-full my-8 mb-10 w-full hover:bg-[#D44316] focus:outline-none'
+                    className='bg-[#E04717] h-16 text-lg text-white font-bold p-3 rounded-full my-8 mb-5 w-full hover:bg-[#D44316] focus:outline-none'
                     type="submit"
                 >
-                Sign in
+                    Sign in
                 </button>
+                <div className='self-center'>
+                    {isLoading ? <ColorRing width={50} height={50}/> : ''}
+                </div>
 
                 {authenticated && (
                     <p className='mt-4 text-green-500'>
@@ -90,7 +94,6 @@ const LoginForm = () => {
                                 {loginError}
                             </Alert>
                         )}
-                        <br/>
                     </>
                 )}
             </form>

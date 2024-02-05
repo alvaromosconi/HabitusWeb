@@ -11,6 +11,7 @@ import TelegramSetupForm from './forms/TelegramSetupForm'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import { ColorRing } from 'react-loader-spinner'
 
 function HabitGrid () {
     dayjs.extend(utc)
@@ -21,8 +22,11 @@ function HabitGrid () {
     const [categories, setCategories] = useState<string[]>([])
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const [showTelegramInput, setShowTelegramInput] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const handleHabitChanges = (newHabit: Habit) => {
+        setIsLoading(true)
+        newHabit = habitWithLocalTime(newHabit)
         const existingHabitIndex = habits.findIndex((hab) => hab.id === newHabit.id)
         if (existingHabitIndex === -1) {
             setHabits([...habits, newHabit])
@@ -31,34 +35,45 @@ function HabitGrid () {
             setHabits([...habits])
         }
         setIsModalOpen(false)
+        setIsLoading(false)
     }
 
     useEffect(() => {
-        const fetchHabits = () => {
-            HabitusAPI.getHabits()
-                .then((data: Habit[]) => {
-                    // Transformar cada habit.notificationTime a la hora local
-                    const habitsWithLocalTime = data.map(habit => {
-                        const localTime = dayjs.utc(habit.notificationTime, 'HH:mm:ss').tz(dayjs.tz.guess())
-                        return { ...habit, notificationTime: localTime.format('HH:mm:ss') }
-                    })
-                    setHabits(habitsWithLocalTime)
-                })
-                .catch((err: any) => {
-                    console.log(err)
-                })
-        }
-        fetchHabits()
-    }, [])
+        void fetchHabits()
+      }, [])
+
+    const fetchHabits = async () => {
+        setIsLoading(true)
+        await HabitusAPI.getHabits()
+            .then((data: Habit[]) => {
+                setHabits(habitsWithLocalTime(data))
+                setIsLoading(false)
+            })
+            .catch((err: any) => {
+                console.error(err)
+            })
+        setIsLoading(false)
+    }
 
     useEffect(() => {
         const updateCategories = () => {
             const userCategories = Array.from(new Set(habits.map((habit) => habit.category.name)))
             setCategories(userCategories)
         }
-
         updateCategories()
     }, [habits])
+
+    const habitsWithLocalTime = (data: Habit[]): Habit[] => {
+        const formattedHabits = data.map(habit => {
+            return habitWithLocalTime(habit)
+        })
+        return formattedHabits
+    }
+
+    const habitWithLocalTime = (habit: Habit): Habit => {
+        const localTime = dayjs.utc(habit.notificationTime, 'HH:mm:ss').tz(dayjs.tz.guess())
+        return { ...habit, notificationTime: localTime.format('HH:mm:ss') }
+    }
 
     const handleAddButtonClick = () => {
         setIsModalOpen(true)
@@ -70,6 +85,7 @@ function HabitGrid () {
     }
 
     const handleDeleteButtonClick = async (habit: Habit) => {
+        setIsLoading(true)
         try {
             await HabitusAPI.deleteHabit(habit.id)
             setHabits((prevHabits) => {
@@ -79,6 +95,7 @@ function HabitGrid () {
         } catch (error) {
             console.error('Error deleting habit:', error)
         }
+        setIsLoading(false)
     }
 
     const handleTelegramButtonClick = () => {
@@ -86,6 +103,7 @@ function HabitGrid () {
     }
 
     const handleTelegramSubmit = async (userEnteredCode: number) => {
+        setIsLoading(true)
         await HabitusAPI.updateTelegramChatId(userEnteredCode)
             .then(async (response: APIResponse) => {
                 localStorage.setItem('user', JSON.stringify(response.resource))
@@ -97,6 +115,7 @@ function HabitGrid () {
             .finally(() => {
                 setShowTelegramInput(false)
             })
+        setIsLoading(false)
     }
 
     const closeModal = () => {
@@ -110,6 +129,12 @@ function HabitGrid () {
 
     return (
         <div className='mx-16 my-16'>
+            {isLoading
+            ? <div className='fixed top-0 left-0 w-full h-full bg-[rgba(255, 255, 255, 0.7)] flex items-center justify-center z-999'>
+                    <ColorRing width={100} height={100}/>
+                </div>
+                : ''
+            }
             <DefaultHabitBox onAddButtonClick={handleAddButtonClick} />
             <div className="">
                 {categories.map((category, index) => (

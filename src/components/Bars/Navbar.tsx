@@ -4,6 +4,7 @@
 import { useContext, useState } from 'react'
 import { Bars4Icon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { AuthContext } from '../../context/AuthContext'
+import { type User } from '../../types/habitus-types'
 
 // Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white"
 
@@ -20,6 +21,13 @@ export function Navbar ({ showSidebar, setShowSidebar }: Props) {
 		setIsOpen(!isOpen)
 	}
 
+	const removeTelegramCode = () => {
+		const user: User | undefined = JSON.parse(localStorage.getItem('user') ?? 'null')
+		if (user != null) {
+			delete (user as { chatId?: number }).chatId
+		  	localStorage.setItem('user', JSON.stringify(user))
+		}
+	  }
 	return (
 		<nav className="bg-gray-800 text-white w-full">
 			<div className="mx-auto max-w-screen-2xl px-2">
@@ -56,10 +64,10 @@ export function Navbar ({ showSidebar, setShowSidebar }: Props) {
 								<span className="sr-only">Open user menu</span>
 								<UserCircleIcon className='w-8 h-8'/>
 							</button>
-							<div className={`absolute right-0 z-10 mt-2 w-max origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${isOpen ? 'block' : 'hidden'}`}>
+							<div className={`flex flex-col absolute right-0 z-10 mt-2 w-max origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${isOpen ? 'block' : 'hidden'}`}>
 								{localStorage.getItem('authenticated') === 'true'
-								?	<button type='button' onClick={logout}>
-										<a href="/login" className="w-max hover:bg-gray-300 block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-2">
+								?	<button type='button' className='w-[100%]' onClick={logout}>
+										<a href="/login" className="w-[100%] hover:bg-gray-300 block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-2">
 											Sign out
 										</a>
 									</button>
@@ -67,6 +75,11 @@ export function Navbar ({ showSidebar, setShowSidebar }: Props) {
 										Sign in
 									</a>
 								}
+								<button type='button' onClick={removeTelegramCode}>
+									<a href="/login" className="w-max hover:bg-gray-300 block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-2">
+										Reset Telegram Configuration
+									</a>
+								</button>
 							</div>
 					</div>
 					</div>
