@@ -71,7 +71,7 @@ export function Navbar ({ showSidebar, setShowSidebar }: Props) {
 											Sign out
 										</a>
 									</button>
-								:	<a href="/login" className="w-max hover:bg-gray-300 block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-2">
+								:	<a href="/login" className="w-[100%] hover:bg-gray-300 block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-2">
 										Sign in
 									</a>
 								}

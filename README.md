@@ -12,3 +12,5 @@ Habitus is a web application that helps you create and maintain your habits.
 - React
 - TypeScript
 - Tailwind CSS
+
+## Backend GitHub Repo: https://github.com/alvaromosconi/Habitus
